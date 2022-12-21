@@ -17,7 +17,7 @@ const showTabContent = (i = 0) => {
 };
 showTabContent();
 
-// дз задание первое
+//////////////////////////////////////////////////////////////
 let c = 0;
 const slider = (e) => {
   setInterval((i) => {
@@ -25,7 +25,7 @@ const slider = (e) => {
     hideTabContent();
     showTabContent(c);
     c++;
-  }, 2300);
+  }, 1500);
 };
 slider();
 tabsParent.addEventListener("click", (e) => {
@@ -39,9 +39,8 @@ tabsParent.addEventListener("click", (e) => {
     });
   }
 });
-// конец первого задания дз
+//////////////////////////////////////////////////////////////
 
-// modal
 const modal = document.querySelector(".modal");
 const modalTrigger = document.querySelector(".btn_white");
 const closeModalBtn = document.querySelector(".modal__close");
@@ -59,13 +58,13 @@ const closeModal = () => {
 modalTrigger.addEventListener("click", openModal);
 closeModalBtn.addEventListener("click", closeModal);
 
-// дз задание второе
+////////////////////////////////////////////////////////////////
 const diolog = document.querySelector(".modal__dialog");
 modal.addEventListener("click", (e) => {
   if (!diolog.contains(e.target) && modal.classList.contains("show"))
     closeModal();
 });
-// дз здание третье
+////////////////////////////////////////////////////////////////
 const scroolEnd = () => {
   const footer = document.documentElement;
   if (footer.scrollTop + footer.clientHeight >= footer.scrollHeight - 0.8) {
