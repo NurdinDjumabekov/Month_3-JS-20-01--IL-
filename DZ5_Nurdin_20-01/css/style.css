@@ -181,8 +181,30 @@ a {
 .tabcontent {
   width: 850px;
   position: relative;
+  animation: anime 0.9s linear;
 }
-
+@keyframes anime {
+  0% {
+    opacity: 0.2;
+    transform: rotate(30deg);
+  }
+  25% {
+    opacity: 0.4;
+    transform: rotate(90deg);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(0.6) rotate(180deg);
+  }
+  75% {
+    opacity: 0.8;
+    transform: scale(0.4) rotate(270deg);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(360deg);
+  }
+}
 .tabcontent img {
   width: 100%;
   height: 100%;
@@ -661,6 +683,7 @@ a {
 .modal__dialog {
   max-width: 500px;
   margin: 40px auto;
+  position: relative;
 }
 
 .modal__content {
@@ -718,15 +741,20 @@ a {
 .show {
   display: block;
 }
-.fade {
-  animation: fade 1.7s linear;
-}
 
-@keyframes fade {
-  0% {
-    opacity: 0.1;
-  }
-  100% {
-    opacity: 1;
-  }
+/* messageBlock */
+.messageBlock {
+  width: 110%;
+  height: 110%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 36px;
+  line-height: 42px;
+  font-weight: 700;
+  border-radius: 20px;
+  position: absolute;
+  background: rgb(73, 159, 185);
+  left: -10px;
+  top: -10px;
 }
