@@ -3,7 +3,7 @@ const btnStart = document.querySelector(".btn_start");
 const btn_result = document.getElementById("btn_inner_down");
 const div_parent = document.querySelector(".div_parent_2");
 // nur-dinDjumabekov2002@gmail.com
-const gmailRegExp_1 = /^[A-Za-z0-9_\-]+\@[gmail]+\.[A-Za-z]{2,3}$/;
+const gmailRegExp_1 = /^[A-Za-z0-9\-\.\_]+\@[gmail]+\.[A-Za-z]{2,3}$/;
 function startFunction() {
   if (gmailRegExp_1.test(gmailInput.value)) {
     btn_result.innerText = "✓";
@@ -24,22 +24,28 @@ btnStart.onclick = () => {
     location.reload();
   };
 };
-
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
 
 const innerSquare = document.querySelector(".div_inner_square_1");
 const innerSquare_bnt = document.querySelector(".bnt_square");
 innerSquare_bnt.onclick = () => {
   let marginLeft = 0;
-  innerSquare.style.marginLeft = "0px";
   let i = 0;
+  innerSquare.style.marginLeft = "0px";
   function startLeft() {
-    i += 10;
-    console.log(i);
+    i += 50;
     innerSquare.style.marginLeft = i + "px";
-    if (i < 646) {
-      startLeft();
-    }
+    setTimeout(() => {
+      if (i < 646) {
+        startLeft();
+      }
+    }, 100);
   }
   startLeft();
 };
+
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
