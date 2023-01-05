@@ -5,25 +5,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DZ-3</title>
-    <style>
-      .box {
-        position: relative;
-        width: 500px;
-        height: 500px;
-        border: 1px solid black;
-        margin: 0 auto;
-      }
-      .block {
-        position: absolute;
-        width: 50px;
-        height: 50px;
-        background-color: aqua;
-      }
-    </style>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="box">
-      <div class="block"></div>
+    <div class="parent">
+      <div class="box">
+        <div class="block"></div>
+      </div>
+      <div class="time">
+        <p id="p_time">0</p>
+      </div>
     </div>
   </body>
   <script src="main.js"></script>
