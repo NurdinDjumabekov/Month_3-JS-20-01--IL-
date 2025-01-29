@@ -1,0 +1,40 @@
+.mainInfo {
+  &__inner {
+    .toggle {
+      position: relative;
+      padding: 14px 10px 9px 0px;
+
+      &__inner {
+        position: absolute;
+        right: -5px;
+        top: 3px;
+      }
+    }
+
+    .info {
+      padding: 12px 10px 10px 0px;
+
+      .edit {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+
+        svg {
+          width: 16px !important;
+          height: 16px !important;
+        }
+
+        span {
+          margin-bottom: 1px;
+        }
+      }
+    }
+    .del {
+      svg {
+        width: 19px !important;
+        height: 19px !important;
+        color: rgba(255, 0, 0, 0.545);
+      }
+    }
+  }
+}

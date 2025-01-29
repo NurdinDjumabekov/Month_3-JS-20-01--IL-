@@ -1,0 +1,106 @@
+.expensePage {
+  height: 100%;
+
+  &__inner {
+    height: calc(100% - 80px);
+    overflow-y: scroll;
+    margin: 5px 0 0 0;
+
+    .list {
+      padding: 0px 8px;
+
+      > div {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        background-color: #d4dfee78;
+        border: 1px solid rgba(47, 71, 190, 0.107);
+        border-radius: 5px;
+        margin: 8px auto;
+        padding: 10px;
+        padding-right: 35px;
+        width: 100%;
+        position: relative;
+
+        .mainData {
+          width: 65%;
+
+          p {
+            color: rgba(47, 71, 190, 0.687);
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 17px;
+          }
+
+          span {
+            display: block;
+            font-size: 13px;
+            font-weight: 400;
+            margin-top: 5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            // white-space: nowrap;
+          }
+        }
+
+        .status {
+          width: 35%;
+
+          p {
+            font-size: 13px;
+            font-weight: 500;
+          }
+        }
+
+        .del {
+          position: absolute;
+          right: 7px;
+          top: 10px;
+          background: transparent;
+        }
+      }
+    }
+  }
+
+  .createExpense {
+    position: fixed;
+    left: 50%;
+    bottom: 15px;
+    transform: translateX(-50%);
+    width: 95%;
+    height: 45px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #4361ee;
+    z-index: 10;
+
+    p {
+      color: #fff;
+      font-size: 16px;
+      font-weight: 500;
+    }
+  }
+}
+
+.createExpense {
+  .sendData {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    background: #00ab55;
+    width: 100%;
+    height: 42px;
+    border-radius: 5px;
+
+    p {
+      color: #fff;
+      font-size: 16px;
+      font-weight: 500;
+    }
+  }
+}
