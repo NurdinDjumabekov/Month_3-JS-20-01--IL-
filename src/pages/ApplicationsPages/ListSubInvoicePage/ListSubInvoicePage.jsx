@@ -43,7 +43,7 @@ const ListSubInvoicePage = () => {
         comment: "",
         type_sub_invoice: 1,
         invoice_guid: state?.invoice_guid,
-        is_unusable: 1,
+        is_unusable: 0,
       })
     ).unwrap();
     if (res?.result == 1) {

@@ -13,6 +13,7 @@ const initialState = {
   listSubInvoice: [], /// список накладных
   everySubInvoice: {}, /// каждая накладная
   listKoptilshiks: [], /// список коптильщиков
+  listAllProds: [], /// список коптильщиков
 
   activeSlide: 0,
   listMenu: [...listMenuLocal],
@@ -108,6 +109,24 @@ export const getListKopt = createAsyncThunk(
   }
 );
 
+////// getListProdsReq - get список товаров с категориями
+export const getListProdsReq = createAsyncThunk(
+  "getListProdsReq",
+  async function (props, { dispatch, rejectWithValue }) {
+    const url = `${REACT_APP_API_URL}/ta/get_product?workshop_guid=B717DA43-927B-4252-9B03-91EA6A22D7A8&type=agent`;
+    try {
+      const response = await axiosInstance(url);
+      if (response.status >= 200 && response.status < 300) {
+        return response?.data;
+      } else {
+        throw Error(`Error: ${response.status}`);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const mainSlice = createSlice({
   name: "mainSlice",
   initialState,
@@ -174,6 +193,20 @@ const mainSlice = createSlice({
       state.preloader = false;
     });
     builder.addCase(getListKopt.pending, (state, action) => {
+      state.preloader = true;
+    });
+
+    ///////////////// getListProdsReq
+    builder.addCase(getListProdsReq.fulfilled, (state, action) => {
+      state.preloader = false;
+      state.listAllProds = action.payload;
+    });
+    builder.addCase(getListProdsReq.rejected, (state, action) => {
+      state.error = action.payload;
+      state.listAllProds = [];
+      state.preloader = false;
+    });
+    builder.addCase(getListProdsReq.pending, (state, action) => {
       state.preloader = true;
     });
   },

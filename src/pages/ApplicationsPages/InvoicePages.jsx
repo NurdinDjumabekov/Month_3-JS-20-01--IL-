@@ -11,6 +11,7 @@ import ListInvoicePage from "./ListInvoicePage/ListInvoicePage";
 import ListSubInvoicePage from "./ListSubInvoicePage/ListSubInvoicePage";
 import CreateSubInvoice from "./CreateSubInvoice/CreateSubInvoice";
 import EverySubInvoicePage from "./EverySubInvoicePage/EverySubInvoicePage";
+import ListProdSubInvoicePage from "./ListProdSubInvoicePage/ListProdSubInvoicePage";
 
 const InvoicePages = () => {
   const dispatch = useDispatch();
@@ -21,7 +22,8 @@ const InvoicePages = () => {
       <Route path="/main" element={<ListInvoicePage />} />
       <Route path="/list_sub_invoice" element={<ListSubInvoicePage />} />
       <Route path="/every_sub_invoice" element={<EverySubInvoicePage />} />
-      <Route path="/create_sub_invoice" element={<CreateSubInvoice />} />
+      {/* <Route path="/create_sub_invoice" element={<CreateSubInvoice />} /> */}
+      <Route path="/crud_invoice" element={<ListProdSubInvoicePage />} />
       {/* <Route path="/crud_invoice" element={<CreateInvoicePage />} />
       <Route path="/input_prods" element={<InputInvoicePage />} /> */}
     </Routes>

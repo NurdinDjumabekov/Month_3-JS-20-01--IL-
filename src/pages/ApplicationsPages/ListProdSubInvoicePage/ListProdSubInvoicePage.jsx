@@ -6,14 +6,11 @@ import { useEffect, useRef } from "react";
 ////// fns
 import {
   activeSlideFN,
-  getEverySubInvoice,
-  getListKopt,
+  getListProdsReq,
 } from "../../../store/reducers/mainSlice";
 
 ////// components
 import NavMenu from "../../../common/NavMenu/NavMenu";
-import ViewSubInvoice from "../../../components/ApplicationsPages/EverySubInvoicePage/ViewSubInvoice/ViewSubInvoice";
-import VeiwProducts from "../../../components/ApplicationsPages/EverySubInvoicePage/VeiwProducts/VeiwProducts";
 import { NoneBtn } from "../CreateInvoicePage/CreateInvoicePage";
 import Slider from "react-slick";
 
@@ -21,10 +18,12 @@ import Slider from "react-slick";
 import "./style.scss";
 
 ///// helpers
+import { listMenuProdsLocal } from "../../../helpers/LocalData";
+import AllListProd from "../../../components/ApplicationsPages/ListProdSubInvoicePage/AllListProd/AllListProd";
 
 //// icons
 
-const EverySubInvoicePage = () => {
+const ListProdSubInvoicePage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { state } = useLocation();
@@ -34,15 +33,13 @@ const EverySubInvoicePage = () => {
   const sliderRef = useRef(null);
 
   const { listMenu, activeSlide } = useSelector((state) => state.mainSlice);
-  const { everySubInvoice } = useSelector((state) => state.mainSlice);
 
   useEffect(() => {
-    dispatch(getListKopt());
-    getData();
-  }, [state?.guid_sub_invoice]);
+    dispatch(getListProdsReq());
+  }, []);
 
   const getData = () => {
-    dispatch(getEverySubInvoice({ guid_sub_invoice: state?.guid_sub_invoice }));
+    console.log("sadasd");
   };
 
   const settings = {
@@ -76,10 +73,10 @@ const EverySubInvoicePage = () => {
 
   return (
     <div className="listInvoicePage subInvoices">
-      <NavMenu navText={`Накладная № ${everySubInvoice?.codeid}`} />
+      <NavMenu navText={`Выбор продукции`} />
       <div className="actionForPoints">
         <div className="listActions" ref={listActionsRef}>
-          {listMenu?.map(({ codeid, name }, idx) => (
+          {listMenuProdsLocal?.map(({ codeid, name }, idx) => (
             <p
               key={codeid}
               ref={(el) => (menuRefs.current[idx] = el)}
@@ -93,24 +90,17 @@ const EverySubInvoicePage = () => {
         <div className="actionForPoints__content">
           <Slider ref={sliderRef} {...settings}>
             <div className="everySlide">
-              <ViewSubInvoice item={everySubInvoice} getData={getData} />
+              <AllListProd />
             </div>
 
-            <div className="everySlide">
-              <VeiwProducts products={everySubInvoice?.products} />
-            </div>
+            <div className="everySlide"></div>
 
-            <div className="everySlide">Этот функционал добавим по позже</div>
+            <div className="everySlide"></div>
           </Slider>
         </div>
       </div>
-
-      {/* <button className="createBtns" onClick={createSubInvoice}>
-        <AddIcon sx={{ color: "#fff" }} />
-        <p>Создать накладную</p>
-      </button> */}
     </div>
   );
 };
 
-export default EverySubInvoicePage;
+export default ListProdSubInvoicePage;

@@ -1,0 +1,39 @@
+.allListProd {
+  .standartTable {
+    table {
+      border-top: 1px solid #2222222c !important;
+      thead {
+        padding: 3px 0 0 0;
+        tr {
+          th:last-child {
+            padding: 15px 5px !important;
+            font-weight: 500;
+            font-size: 18px;
+          }
+        }
+      }
+
+      tbody {
+        tr {
+          padding: 0 10px !important;
+
+          th:first-child {
+            padding-left: 15px !important;
+          }
+
+          th:last-child {
+            padding-right: 15px !important;
+          }
+
+          td,
+          th {
+            font-weight: 500;
+            padding-top: 10px !important;
+            padding-bottom: 10px !important;
+            font-size: 18px !important;
+          }
+        }
+      }
+    }
+  }
+}

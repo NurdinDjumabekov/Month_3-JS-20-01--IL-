@@ -1,8 +1,7 @@
 ////// hooks
-import * as React from "react";
 import { useState } from "react";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 
 ////// components
 import { Table, TableBody, TableCell, Tooltip } from "@mui/material";
@@ -14,16 +13,21 @@ import { TableRow, Paper } from "@mui/material";
 ////// fns
 
 ////// icons
+import AddIcons from "@mui/icons-material/AddOutlined";
 
 ////// style
 import "./style.scss";
-import DeleteIcon from "../../../../assets/MyIcons/DeleteIcon";
-import { roundingNum } from "../../../../helpers/totals";
 
 const VeiwProducts = (props) => {
   const { products } = props;
 
-  const delStyle = { color: "rgba(213, 42, 42, 0.848)", width: 20, height: 20 };
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const editListProds = () => {
+    navigate("/invoice/crud_invoice", { state: {} });
+  };
 
   return (
     <div className="listAcceptProd">
@@ -63,9 +67,19 @@ const VeiwProducts = (props) => {
                 </TableCell>
               </TableRow>
             ))}
+            {products?.length == 0 && (
+              <TableRow>
+                <TableCell colSpan={3} align="center">
+                  Список пустой
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </TableContainer>
+      <button className="addProds" onClick={editListProds}>
+        <AddIcons sx={{ color: "#fff" }} />
+      </button>
     </div>
   );
 };

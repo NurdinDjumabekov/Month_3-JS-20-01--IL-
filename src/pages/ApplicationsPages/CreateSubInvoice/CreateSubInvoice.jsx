@@ -15,19 +15,18 @@ import "./style.scss";
 import { roundingNum } from "../../../helpers/totals";
 
 const CreateSubInvoice = () => {
-    const dispatch = useDispatch();
-    const location = useLocation();
-    const navigate = useNavigate();
-
+  const dispatch = useDispatch();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const { listInvoice } = useSelector((state) => state.mainSlice);
 
   return (
-    <div className='createSubInvoice'>
+    <div className="createSubInvoice">
       <NavMenu navText={"Список главных накладных"} />
       <div className="createSubInvoice__list"></div>
     </div>
-  )
-}
+  );
+};
 
-export default CreateSubInvoice
+export default CreateSubInvoice;

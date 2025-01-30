@@ -80,3 +80,9 @@ export const listMenuLocal = [
   { name: "Номенклатура", codeid: 1 },
   { name: "История накладной", codeid: 2 },
 ];
+
+export const listMenuProdsLocal = [
+  { name: "Все товары", codeid: 0 },
+  { name: "Активный список", codeid: 1 },
+  { name: "Товары накладной", codeid: 2 },
+];
