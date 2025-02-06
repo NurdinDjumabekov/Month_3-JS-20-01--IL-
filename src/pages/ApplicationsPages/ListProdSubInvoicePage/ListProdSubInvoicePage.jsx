@@ -1,11 +1,12 @@
 ////// hooks
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 ////// fns
 import {
-  activeSlideFN,
+  activeSlideForProdFN,
+  getEverySubInvoiceReq,
   getListProdsReq,
 } from "../../../store/reducers/mainSlice";
 
@@ -13,13 +14,14 @@ import {
 import NavMenu from "../../../common/NavMenu/NavMenu";
 import { NoneBtn } from "../CreateInvoicePage/CreateInvoicePage";
 import Slider from "react-slick";
+import AllListProd from "../../../components/ApplicationsPages/ListProdSubInvoicePage/AllListProd/AllListProd";
+import VeiwProducts from "../../../components/ApplicationsPages/EverySubInvoicePage/VeiwProducts/VeiwProducts";
 
 ////// style
 import "./style.scss";
 
 ///// helpers
 import { listMenuProdsLocal } from "../../../helpers/LocalData";
-import AllListProd from "../../../components/ApplicationsPages/ListProdSubInvoicePage/AllListProd/AllListProd";
 
 //// icons
 
@@ -32,15 +34,15 @@ const ListProdSubInvoicePage = () => {
   const menuRefs = useRef([]);
   const sliderRef = useRef(null);
 
-  const { listMenu, activeSlide } = useSelector((state) => state.mainSlice);
+  const { listMenu, activeSlideForProd } = useSelector(
+    (state) => state.mainSlice
+  );
+  const { everySubInvoice } = useSelector((state) => state.mainSlice);
 
   useEffect(() => {
     dispatch(getListProdsReq());
+    dispatch(getEverySubInvoiceReq({ guid_sub_invoice: state }));
   }, []);
-
-  const getData = () => {
-    console.log("sadasd");
-  };
 
   const settings = {
     dots: false,
@@ -50,9 +52,9 @@ const ListProdSubInvoicePage = () => {
     slidesToScroll: 1,
     nextArrow: <NoneBtn />,
     prevArrow: <NoneBtn />,
-    initialSlide: activeSlide,
+    initialSlide: activeSlideForProd,
     afterChange: (current) => {
-      dispatch(activeSlideFN(current));
+      dispatch(activeSlideForProdFN(current));
       const isLastElement = current === listMenu?.length - 1;
       if (isLastElement) {
         listActionsRef.current.scrollLeft = listActionsRef.current.scrollWidth;
@@ -67,12 +69,12 @@ const ListProdSubInvoicePage = () => {
   };
 
   const handleMenuClick = (codeid) => {
-    dispatch(activeSlideFN(codeid));
+    dispatch(activeSlideForProdFN(codeid));
     sliderRef.current?.slickGoTo(codeid);
   };
 
   return (
-    <div className="listInvoicePage subInvoices">
+    <div className="listInvoicePage subInvoices innerSlider">
       <NavMenu navText={`Выбор продукции`} />
       <div className="actionForPoints">
         <div className="listActions" ref={listActionsRef}>
@@ -80,7 +82,7 @@ const ListProdSubInvoicePage = () => {
             <p
               key={codeid}
               ref={(el) => (menuRefs.current[idx] = el)}
-              className={codeid === activeSlide ? "actives" : ""}
+              className={codeid == activeSlideForProd ? "actives" : ""}
               onClick={() => handleMenuClick(codeid)}
             >
               {name}
@@ -90,12 +92,19 @@ const ListProdSubInvoicePage = () => {
         <div className="actionForPoints__content">
           <Slider ref={sliderRef} {...settings}>
             <div className="everySlide">
-              <AllListProd />
+              <AllListProd guid_sub_invoice={state} />
             </div>
 
-            <div className="everySlide"></div>
+            <div className="everySlide">
+              <AllListProd guid_sub_invoice={state} />
+            </div>
 
-            <div className="everySlide"></div>
+            <div className="everySlide">
+              <VeiwProducts
+                products={everySubInvoice?.products}
+                guid_sub_invoice={state}
+              />
+            </div>
           </Slider>
         </div>
       </div>

@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
 ////// fns
-import { getListInvoice } from "../../../store/reducers/mainSlice";
+import { getListInvoiceReq } from "../../../store/reducers/mainSlice";
 
 ////// components
 import NavMenu from "../../../common/NavMenu/NavMenu";
@@ -23,7 +23,7 @@ const ListInvoicePage = () => {
   const { listInvoice } = useSelector((state) => state.mainSlice);
 
   useEffect(() => {
-    dispatch(getListInvoice());
+    dispatch(getListInvoiceReq());
   }, []);
 
   function clickInvoice(item) {
@@ -36,6 +36,10 @@ const ListInvoicePage = () => {
       <div className="listInvoices">
         {listInvoice?.map((item, index) => (
           <div className="every" key={index} onClick={() => clickInvoice(item)}>
+            <div className="info">
+              <p>Тип накладной: </p>
+              <span>Главный</span>
+            </div>
             <div className="info">
               <p>Дата: </p>
               <span>{item?.date_from || "..."}</span>

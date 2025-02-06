@@ -14,12 +14,12 @@ import krest from "../../../assets/icons/krest.svg";
 
 ///// helpers
 import { myAlert } from "../../../helpers/MyAlert";
-import { roundingNum } from "../../../helpers/totals";
 
 ///// fns
-import { getListProdsInInvoiceNur } from "../../../store/reducers/standartSlice";
-import { editProdsInInvoiceNur } from "../../../store/reducers/standartSlice";
-import { addProdsInInvoiceNur } from "../../../store/reducers/standartSlice";
+import {
+  addProdsInInvoiceReq,
+  getEverySubInvoiceReq,
+} from "../../../store/reducers/mainSlice";
 
 const InputInvoicePage = () => {
   const dispatch = useDispatch();
@@ -27,113 +27,47 @@ const InputInvoicePage = () => {
   const location = useLocation();
   const inputRef = useRef(null);
 
-  /// action - 1 - создание заявки
-  /// action - 2 - редактирвоание заявки
+  /// action - 1 - создание заявки, 2 - редактирвоание заявки
 
   const { product_name, invoice_guid, workshop_price } = location?.state;
   const { category_name, product_guid, action } = location?.state;
-  const { count_kg, type_unit, checkTypeProds } = location?.state;
-  const amount = location?.state?.amount;
-  const amount_kg = location?.state?.amount_kg;
+  const { count_kg, type_unit } = location?.state;
+
+  const { dataSave } = useSelector((state) => state.saveDataSlice);
 
   const [count, setCount] = useState("");
 
   const onChange = (e) => {
-    const value = e.target.value;
-
     // Проверка: цифры и до 3 цифр после точки
-    if (/^\d*\.?\d{0,3}$/.test(value)) {
-      setCount(value);
-    }
+    if (/^\d*\.?\d{0,3}$/.test(e.target.value)) setCount(e.target.value);
   };
 
   useEffect(() => {
     setTimeout(() => {
       inputRef?.current.focus();
     }, 300);
-
-    switch (action) {
-      case 1:
-        setCount(count_kg);
-        break;
-      case 2:
-        setCount(count_kg);
-        break;
-
-      default:
-        break;
-    }
+    setCount(count_kg);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, [action]);
 
-  const addProds = async (e) => {
+  const crudProdsFN = async (e) => {
     e.preventDefault();
-
-    if (!!!count) {
-      myAlert("Поля не должны быть пустыми или равны 0", "error");
-      return;
-    }
-
-    const products = [{ product_guid, count, workshop_price }];
-    const data = { invoice_guid, comment: "...", products };
-    const res = await dispatch(addProdsInInvoiceNur({ data })).unwrap();
-
-    /// список товаров определённого заказа
-    if (res?.results?.[0] == 1) {
-      dispatch(getListProdsInInvoiceNur(invoice_guid));
+    const noNone = "Поля не должны быть пустыми или равны 0";
+    if (!!!count) return myAlert(noNone, "error");
+    const data = {
+      invoice_guid,
+      product_guid,
+      workshop_price,
+      count,
+      user_guid: dataSave?.guid,
+      user_type: dataSave?.user_type,
+      action_type: action,
+    };
+    const res = await dispatch(addProdsInInvoiceReq(data)).unwrap();
+    if (!!res) {
+      myAlert(action == 1 ? "Продукт добавлен" : "Продукт обновлён");
       navigate(-1);
-    }
-    if (res?.results?.[0] == -2) {
-      myAlert("Вакуммный товар не может быть добавлен на эту дату", "error");
-      // navigate(-1);
-    }
-    if (res?.results?.[0] == -3) {
-      myAlert(
-        "В список вакуумных товаров нельзя добавить без вакуум, создайте новую заявку!",
-        "error"
-      );
-      // navigate(-1);
-    }
-    if (res?.results?.[0] == -4) {
-      myAlert(
-        "В список без вакуумных товаров нельзя добавить вакуум, создайте новую заявку!",
-        "error"
-      );
-      // navigate(-1);
-    }
-  };
-
-  const editProds = async (e) => {
-    e.preventDefault();
-    if (!!!count) {
-      myAlert("Поля не должны быть пустыми или равны 0", "error");
-      return;
-    }
-
-    const products = [{ product_guid, count, workshop_price }];
-    const data = { invoice_guid, comment: "...", products, status: 2 };
-    const res = await dispatch(editProdsInInvoiceNur({ data })).unwrap();
-
-    if (res?.[0]?.result == 1) {
-      myAlert("Отредактировано успешно");
-      /// список товаров определённого заказа
-      dispatch(getListProdsInInvoiceNur(invoice_guid));
-      navigate(-1);
-    } else {
-      myAlert(res?.[0]?.msg, "error");
-    }
-  };
-
-  const crateaction = (e) => {
-    switch (action) {
-      case 1:
-        addProds(e);
-        break;
-      case 2:
-        editProds(e);
-        break;
-
-      default:
-        break;
+      dispatch(getEverySubInvoiceReq({ guid_sub_invoice: invoice_guid }));
     }
   };
 
@@ -153,33 +87,14 @@ const InputInvoicePage = () => {
             <img src={krest} alt="x" />
           </button>
         </div>
-        {!!checkTypeProds && (
-          <>
-            <div className="info lefttovers">
-              <p>Остаток в кг: </p>
-              <span>{roundingNum(amount_kg)} кг</span>
-            </div>
-            <div className="info lefttovers">
-              <p>Остаток в шт: </p>
-              <span>{roundingNum(amount)} шт</span>
-            </div>
-          </>
-        )}
-        <div className="price">
-          <div className="inputSend">
-            <p>Цена товара</p>
-            <input value={`${workshop_price} сом`} readOnly />
-          </div>
-        </div>
-
-        <form className="count" onSubmit={crateaction}>
+        <form className="count" onSubmit={crudProdsFN}>
           <div className="inputSend">
             <p>{objUnit?.[type_unit]}</p>
             <input
+              type="tel"
               value={count}
               onChange={onChange}
               ref={inputRef}
-              type="tel"
               inputMode="decimal"
             />
           </div>

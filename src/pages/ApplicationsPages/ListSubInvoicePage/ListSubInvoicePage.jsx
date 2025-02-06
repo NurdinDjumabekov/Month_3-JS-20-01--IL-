@@ -5,23 +5,23 @@ import { useEffect, useState } from "react";
 
 ////// fns
 import {
+  activeSlideFN,
   crudSubInvoiceReq,
-  getListSubInvoice,
+  getListSubInvoiceReq,
 } from "../../../store/reducers/mainSlice";
 
 ////// components
 import NavMenu from "../../../common/NavMenu/NavMenu";
+import ConfirmModal from "../../../common/ConfirmModal/ConfirmModal";
 
 ////// style
 import "./style.scss";
 
 ///// helpers
 import { roundingNum } from "../../../helpers/totals";
-import { format } from "date-fns";
 
 //// icons
 import AddIcon from "@mui/icons-material/Add";
-import ConfirmModal from "../../../common/ConfirmModal/ConfirmModal";
 
 const ListSubInvoicePage = () => {
   const dispatch = useDispatch();
@@ -33,7 +33,7 @@ const ListSubInvoicePage = () => {
   const { listSubInvoice } = useSelector((state) => state.mainSlice);
 
   useEffect(() => {
-    dispatch(getListSubInvoice({ invoice_guid: state?.invoice_guid }));
+    dispatch(getListSubInvoiceReq({ invoice_guid: state?.invoice_guid }));
   }, []);
 
   const createSubInvoice = async () => {
@@ -51,70 +51,84 @@ const ListSubInvoicePage = () => {
       navigate("/invoice/every_sub_invoice", {
         state: { guid_sub_invoice: res?.guid_sub_invoice },
       });
+      dispatch(activeSlideFN(0));
     }
   };
 
   const viewEverySubInvoice = (state) => {
     navigate("/invoice/every_sub_invoice", { state });
+    dispatch(activeSlideFN(0));
   };
 
   return (
     <div className="listInvoicePage subInvoices">
       <NavMenu navText={`Вложенные накладные`} />
-      <div className="listInvoices">
-        {listSubInvoice?.map((item, index) => (
-          <div
-            className="every"
-            key={index}
-            onClick={() => viewEverySubInvoice(item)}
-          >
-            <div className="info">
-              <p>Дата: </p>
-              <span>{item?.date}</span>
-            </div>
+      {listSubInvoice?.length != 0 && (
+        <div className="listInvoices">
+          {listSubInvoice?.map((item, index) => (
+            <div
+              className="every"
+              key={index}
+              onClick={() => viewEverySubInvoice(item)}
+            >
+              <div className="info">
+                <p>Тип накладной: </p>
+                <span>Вложеный</span>
+              </div>
+              <div className="info">
+                <p>Дата: </p>
+                <span>{item?.date}</span>
+              </div>
 
-            <div className="info">
-              <p>№ </p>
-              <span>{item?.codeid}</span>
-            </div>
+              <div className="info">
+                <p>№ </p>
+                <span>{item?.codeid}</span>
+              </div>
 
-            <div className={`info ${item?.status == 1 ? "loadStatus" : ""}`}>
-              <p>Статус: </p>
-              <span>Черновик</span>
-            </div>
+              <div className={`info ${item?.status == 1 ? "loadStatus" : ""}`}>
+                <p>Статус: </p>
+                <span>Черновик</span>
+              </div>
 
-            <div className="info">
-              <p>Отправитель: </p>
-              <span>{item?.user_from_fio}</span>
-            </div>
+              <div className="info">
+                <p>Отправитель: </p>
+                <span>{item?.user_from_fio}</span>
+              </div>
 
-            <div className="info">
-              <p>Получатель: </p>
-              <span>{item?.user_to_fio || "отсутствует"}</span>
-            </div>
+              <div className="info">
+                <p>Получатель: </p>
+                <span>{item?.user_to_fio || "отсутствует"}</span>
+              </div>
 
-            <div className="info">
-              <p>Итоговое кол-во: </p>
-              <span>{roundingNum(item?.total_count) || ""}</span>
-            </div>
+              <div className="info">
+                <p>Итоговое кол-во: </p>
+                <span>{roundingNum(item?.total_count) || ""}</span>
+              </div>
 
-            <div className="info">
-              <p>Итоговый вес: </p>
-              <span>{roundingNum(item?.total_count_kg) || ""}</span>
-            </div>
+              <div className="info">
+                <p>Итоговый вес: </p>
+                <span>{roundingNum(item?.total_count_kg) || ""}</span>
+              </div>
 
-            <div className="info">
-              <p>Бракованный товар: </p>
-              <span>{!!item?.is_unusable ? "Да" : "Нет"}</span>
-            </div>
+              <div className="info">
+                <p>Бракованный товар: </p>
+                <span>{!!item?.is_unusable ? "Да" : "Нет"}</span>
+              </div>
 
-            {/* <div className="info">
+              {/* <div className="info">
               <p>Комментарий: </p>
               <span>{item?.comment}</span>
             </div> */}
-          </div>
-        ))}
-      </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {listSubInvoice?.length == 0 && (
+        <div className="emptyListData">
+          <p>Список пустой, создайте вложенную накладную</p>
+        </div>
+      )}
 
       <button className="createBtns" onClick={() => setMoodal(true)}>
         <AddIcon sx={{ color: "#fff" }} />

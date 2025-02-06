@@ -1,16 +1,26 @@
 ////// hooks
-import { useState } from "react";
-import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useState } from "react";
 
 ////// components
-import { Table, TableBody, TableCell, Tooltip } from "@mui/material";
-import { TableContainer, TableHead } from "@mui/material";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+} from "@mui/material";
 import { TableRow, Paper } from "@mui/material";
-
-////// helpers
+import ListProds from "../ListProds/ListProds";
+import ConfirmModal from "../../../../common/ConfirmModal/ConfirmModal";
 
 ////// fns
+import {
+  activeSlideForProdFN,
+  addProdsInInvoiceReq,
+  getEverySubInvoiceReq,
+} from "../../../../store/reducers/mainSlice";
 
 ////// icons
 import AddIcons from "@mui/icons-material/AddOutlined";
@@ -18,15 +28,43 @@ import AddIcons from "@mui/icons-material/AddOutlined";
 ////// style
 import "./style.scss";
 
+///// helpers
+import { myAlert } from "../../../../helpers/MyAlert";
+
 const VeiwProducts = (props) => {
-  const { products } = props;
+  const { products, guid_sub_invoice } = props;
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [guidProd, setGuidProd] = useState({});
+
+  const { dataSave } = useSelector((state) => state.saveDataSlice);
+
+  const checkPage = location?.pathname === "/invoice/every_sub_invoice";
+
   const editListProds = () => {
-    navigate("/invoice/crud_invoice", { state: {} });
+    dispatch(activeSlideForProdFN(0));
+    navigate("/invoice/crud_invoice", { state: guid_sub_invoice });
+  };
+
+  const delProdsFN = async () => {
+    const data = {
+      invoice_guid: guid_sub_invoice,
+      product_guid: guidProd?.product_guid,
+      workshop_price: guidProd?.price,
+      count: guidProd?.count,
+      user_guid: dataSave?.guid,
+      user_type: dataSave?.user_type,
+      action_type: 3,
+    };
+    const res = await dispatch(addProdsInInvoiceReq(data)).unwrap();
+    if (!!res) {
+      setGuidProd({});
+      myAlert("Товар удалён");
+      dispatch(getEverySubInvoiceReq({ guid_sub_invoice }));
+    }
   };
 
   return (
@@ -50,22 +88,13 @@ const VeiwProducts = (props) => {
           </TableHead>
           <TableBody>
             {products?.map((row, index) => (
-              <TableRow key={row?.product_guid}>
-                <TableCell
-                  component="th"
-                  scope="row"
-                  align="center"
-                  style={{ width: "10%" }}
-                >
-                  {index + 1}
-                </TableCell>
-                <TableCell component="th" scope="row" style={{ width: "40%" }}>
-                  {row?.product_name}
-                </TableCell>
-                <TableCell align="left" style={{ width: "20%" }}>
-                  {row?.count_kg} кг
-                </TableCell>
-              </TableRow>
+              <ListProds
+                row={row}
+                index={index}
+                setGuidProd={setGuidProd}
+                key={index}
+                guid_sub_invoice={guid_sub_invoice}
+              />
             ))}
             {products?.length == 0 && (
               <TableRow>
@@ -77,9 +106,19 @@ const VeiwProducts = (props) => {
           </TableBody>
         </Table>
       </TableContainer>
-      <button className="addProds" onClick={editListProds}>
-        <AddIcons sx={{ color: "#fff" }} />
-      </button>
+
+      {checkPage && (
+        <button className="addProds" onClick={editListProds}>
+          <AddIcons sx={{ color: "#fff" }} />
+        </button>
+      )}
+
+      <ConfirmModal
+        state={!!guidProd?.product_guid}
+        yesFN={delProdsFN}
+        noFN={() => setGuidProd({})}
+        title={"Удалить продукт ?"}
+      />
     </div>
   );
 };

@@ -9,9 +9,6 @@ import "./style.scss";
 ////// components
 
 /////// fns
-import { getListWorkShop } from "../../store/reducers/orderSlice";
-import { getActiveRouteList } from "../../store/reducers/photoSlice";
-import { getBalance } from "../../store/reducers/paySlice";
 
 const MainLayouts = () => {
   const dispatch = useDispatch();
@@ -19,12 +16,7 @@ const MainLayouts = () => {
 
   const { guid } = useSelector((state) => state.saveDataSlice?.dataSave);
 
-  useEffect(() => {
-    dispatch(getListWorkShop());
-    dispatch(getActiveRouteList(guid)); /// только для ТА
-    //// отправляю запрос для получения точек каждого агента
-    dispatch(getBalance(guid));
-  }, []);
+  useEffect(() => {}, []);
 
   const checkMap = "/points/maps" == pathname;
 

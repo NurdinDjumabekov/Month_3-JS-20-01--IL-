@@ -4,7 +4,7 @@ import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 ////// components
-import { Table, TableBody, TableCell, Tooltip } from "@mui/material";
+import { Table, TableBody, TableCell } from "@mui/material";
 import { TableContainer, TableHead } from "@mui/material";
 import { TableRow, Paper } from "@mui/material";
 
@@ -18,7 +18,7 @@ import { TableRow, Paper } from "@mui/material";
 import "./style.scss";
 
 const AllListProd = (props) => {
-  const { products } = props;
+  const { guid_sub_invoice } = props;
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -26,11 +26,10 @@ const AllListProd = (props) => {
 
   const { listAllProds } = useSelector((state) => state.mainSlice);
 
-  const editListProds = () => {
-    navigate("/invoice/crud_invoice", { state: {} });
+  const clickProd = (item) => {
+    const state = { ...item, invoice_guid: guid_sub_invoice, action: 1 }; /// добавление твоара
+    navigate("/invoice/input_prods", { state });
   };
-
-  const clickProd = () => {};
 
   return (
     <div className="allListProd">

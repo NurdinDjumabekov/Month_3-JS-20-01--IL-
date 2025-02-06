@@ -6,8 +6,8 @@ import { useEffect, useRef } from "react";
 ////// fns
 import {
   activeSlideFN,
-  getEverySubInvoice,
-  getListKopt,
+  getEverySubInvoiceReq,
+  getListCaptReq,
 } from "../../../store/reducers/mainSlice";
 
 ////// components
@@ -37,12 +37,15 @@ const EverySubInvoicePage = () => {
   const { everySubInvoice } = useSelector((state) => state.mainSlice);
 
   useEffect(() => {
-    dispatch(getListKopt());
+    dispatch(getListCaptReq());
     getData();
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }, [state?.guid_sub_invoice]);
 
   const getData = () => {
-    dispatch(getEverySubInvoice({ guid_sub_invoice: state?.guid_sub_invoice }));
+    dispatch(
+      getEverySubInvoiceReq({ guid_sub_invoice: state?.guid_sub_invoice })
+    );
   };
 
   const settings = {
@@ -75,21 +78,22 @@ const EverySubInvoicePage = () => {
   };
 
   return (
-    <div className="listInvoicePage subInvoices">
+    <div className="listInvoicePage subInvoices everySubInvoicePage">
       <NavMenu navText={`Накладная № ${everySubInvoice?.codeid}`} />
       <div className="actionForPoints">
         <div className="listActions" ref={listActionsRef}>
           {listMenu?.map(({ codeid, name }, idx) => (
             <p
               key={codeid}
-              ref={(el) => (menuRefs.current[idx] = el)}
-              className={codeid === activeSlide ? "actives" : ""}
+              ref={(el) => (menuRefs.current[idx + 1] = el)}
+              className={codeid == activeSlide ? "actives" : ""}
               onClick={() => handleMenuClick(codeid)}
             >
               {name}
             </p>
           ))}
         </div>
+
         <div className="actionForPoints__content">
           <Slider ref={sliderRef} {...settings}>
             <div className="everySlide">
@@ -97,10 +101,17 @@ const EverySubInvoicePage = () => {
             </div>
 
             <div className="everySlide">
-              <VeiwProducts products={everySubInvoice?.products} />
+              <VeiwProducts
+                products={everySubInvoice?.products}
+                guid_sub_invoice={state?.guid_sub_invoice}
+              />
             </div>
 
-            <div className="everySlide">Этот функционал добавим по позже</div>
+            <div className="everySlide">
+              <div className="empty">
+                <p>Список пустой</p>
+              </div>
+            </div>
           </Slider>
         </div>
       </div>

@@ -12,6 +12,7 @@ import ExpensePage from "../pages/ExpensePage/ExpensePage";
 import ActionsInPointsPage from "../pages/ActionsInPointsPage/ActionsInPointsPage";
 import WorkshopPages from "../pages/WorkshopPages/WorkshopPages";
 import InvoicePages from "../pages/ApplicationsPages/InvoicePages";
+import SettingsPages from "../pages/SettingsPages/SettingsPages";
 // import { Preloader } from "../components/Preloader/Preloader";
 
 ////fns
@@ -35,6 +36,7 @@ const MainRoutes = () => {
         <Route element={<MainLayouts />}>
           <Route path="/" element={<AllCategPage />} />
           <Route path="/invoice/*" element={<InvoicePages />} />
+          <Route path="/setting/*" element={<SettingsPages />} />
 
           {/* <Route path="/invoice/*" element={<WorkshopPages />} />
           <Route path="/leftovers" element={<LeftoversPage />} />

@@ -152,9 +152,9 @@ export const getMyEveryInvoice = createAsyncThunk(
   }
 );
 
-////// addProdsInInvoiceNur - добаввление товара в накладную
-export const addProdsInInvoiceNur = createAsyncThunk(
-  "addProdsInInvoiceNur",
+////// addProdsInInvoiceReqNur - добаввление товара в накладную
+export const addProdsInInvoiceReqNur = createAsyncThunk(
+  "addProdsInInvoiceReqNur",
   async function ({ data }, { dispatch, rejectWithValue }) {
     const url = `${REACT_APP_API_URL}/ta/create_application_product`;
     try {

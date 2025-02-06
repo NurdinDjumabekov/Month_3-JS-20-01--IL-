@@ -73,6 +73,7 @@ const ViewSubInvoice = (props) => {
     if (!!res?.result) {
       setLook(false);
       getData();
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 

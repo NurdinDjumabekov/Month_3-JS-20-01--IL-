@@ -29,6 +29,19 @@ button {
   cursor: pointer;
 }
 
+.emptyListData {
+  height: calc(100% - 70px);
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  p {
+    font-size: 20px;
+    text-align: center;
+  }
+}
+
 .createBtns {
   align-items: center;
   background: #4361ee;

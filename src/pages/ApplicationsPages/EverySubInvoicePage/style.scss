@@ -9,4 +9,20 @@
       }
     }
   }
+
+  .empty {
+    margin: 180px 0 0 0;
+    text-align: center;
+    p {
+      font-size: 21px;
+    }
+  }
+}
+
+.everySubInvoicePage {
+  .listActions {
+    p:nth-child(3) {
+      min-width: 170px;
+    }
+  }
 }
