@@ -43,9 +43,8 @@ const EverySubInvoicePage = () => {
   }, [state?.guid_sub_invoice]);
 
   const getData = () => {
-    dispatch(
-      getEverySubInvoiceReq({ guid_sub_invoice: state?.guid_sub_invoice })
-    );
+    const send = { guid_sub_invoice: state?.guid_sub_invoice };
+    dispatch(getEverySubInvoiceReq(send));
   };
 
   const settings = {

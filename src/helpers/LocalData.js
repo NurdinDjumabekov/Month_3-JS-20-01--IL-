@@ -95,7 +95,6 @@ export const listMenuProdsLocal = [
   { name: "Товары накладной", codeid: 2 },
 ];
 
-
 function createData(name, calories) {
   return {
     name,

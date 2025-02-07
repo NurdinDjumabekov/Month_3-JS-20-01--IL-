@@ -1,12 +1,11 @@
 ////// hooks
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 // ////// fns
 import {
   getListProdsReq,
-  getListWorkShop,
+  getListWorkShopActiveReq,
 } from "../../../store/reducers/mainSlice";
 
 ////// components
@@ -18,7 +17,6 @@ import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
@@ -28,23 +26,20 @@ import Select from "react-select";
 ////// style
 import "./style.scss";
 
-///// helpers
-
-//// icons
-
-const SortMyListPage = () => {
+const ListEveryUser = ({ list, type }) => {
+  /// 1 - все товары, 2 - выбранные
   const dispatch = useDispatch();
 
   const [select, setSelect] = useState({});
 
-  const { listAllProds, listWH } = useSelector((state) => state.mainSlice);
+  const { listWH } = useSelector((state) => state.mainSlice);
 
   useEffect(() => {
     getData();
   }, []);
 
   const getData = async () => {
-    const res = await dispatch(getListWorkShop()).unwrap();
+    const res = await dispatch(getListWorkShopActiveReq()).unwrap();
     const value = res?.[0]?.guid;
     const label = res?.[0]?.name;
     if (!!value) {
@@ -74,8 +69,8 @@ const SortMyListPage = () => {
         <TableContainer component={Paper}>
           <Table aria-label="collapsible table">
             <TableBody>
-              {listAllProds?.map((row) => (
-                <TableList key={row?.category_guid} row={row} />
+              {list?.map((row, index) => (
+                <TableList key={row?.category_guid} row={row} index={index} />
               ))}
             </TableBody>
           </Table>
@@ -85,9 +80,9 @@ const SortMyListPage = () => {
   );
 };
 
-export default SortMyListPage;
+export default ListEveryUser;
 
-function TableList({ row }) {
+function TableList({ row, index }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -104,7 +99,7 @@ function TableList({ row }) {
           </div>
         </TableCell>
         <TableCell sx={{ fontSize: 16, fontWeight: 600, paddingLeft: "5px" }}>
-          {row?.category_name || "..."}
+          {row?.name || "..."}
         </TableCell>
         <TableCell sx={{ width: 82, fontSize: 16, fontWeight: 600 }}>
           {row?.prods?.length}

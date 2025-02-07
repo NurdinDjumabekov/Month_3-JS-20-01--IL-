@@ -16,6 +16,7 @@ import { NoneBtn } from "../CreateInvoicePage/CreateInvoicePage";
 import Slider from "react-slick";
 import AllListProd from "../../../components/ApplicationsPages/ListProdSubInvoicePage/AllListProd/AllListProd";
 import VeiwProducts from "../../../components/ApplicationsPages/EverySubInvoicePage/VeiwProducts/VeiwProducts";
+import ListEveryUser from "../../../components/InvoicesPages/ListEveryUser/ListEveryUser";
 
 ////// style
 import "./style.scss";
@@ -38,9 +39,9 @@ const ListProdSubInvoicePage = () => {
     (state) => state.mainSlice
   );
   const { everySubInvoice } = useSelector((state) => state.mainSlice);
+  const { listAllProds } = useSelector((state) => state.mainSlice);
 
   useEffect(() => {
-    dispatch(getListProdsReq());
     dispatch(getEverySubInvoiceReq({ guid_sub_invoice: state }));
   }, []);
 
@@ -92,11 +93,12 @@ const ListProdSubInvoicePage = () => {
         <div className="actionForPoints__content">
           <Slider ref={sliderRef} {...settings}>
             <div className="everySlide">
-              <AllListProd guid_sub_invoice={state} />
+              {/* <AllListProd guid_sub_invoice={state} /> */}
+              <ListEveryUser list={listAllProds} type={1} />
             </div>
 
             <div className="everySlide">
-              <AllListProd guid_sub_invoice={state} />
+              {/* <ListEveryUser list={listAllProds} type={2} /> */}
             </div>
 
             <div className="everySlide">

@@ -14,6 +14,7 @@ const initialState = {
   everySubInvoice: {}, /// каждая накладная
   listKoptilshiks: [], /// список коптильщиков
   listAllProds: [], /// список всех товаров
+  listActiveProds: [], /// список активный товаров каждого user(а)
   listWH: [], /// список цехов
 
   activeSlide: 0,
@@ -43,7 +44,7 @@ export const getListInvoiceReq = createAsyncThunk(
 export const getListSubInvoiceReq = createAsyncThunk(
   "getListSubInvoiceReq",
   async function (data, { dispatch, rejectWithValue }) {
-    const url = `${REACT_APP_API_URL}/copt/get_sub_invoice`;
+    const url = `${REACT_APP_API_URL}/capt/get_sub_invoice`;
     try {
       const response = await axiosInstance.post(url, data);
       if (response.status >= 200 && response.status < 300) {
@@ -61,7 +62,7 @@ export const getListSubInvoiceReq = createAsyncThunk(
 export const getEverySubInvoiceReq = createAsyncThunk(
   "getEverySubInvoiceReq",
   async function (data, { dispatch, rejectWithValue }) {
-    const url = `${REACT_APP_API_URL}/copt/get_every_sub_invoice`;
+    const url = `${REACT_APP_API_URL}/capt/get_every_sub_invoice`;
     try {
       const response = await axiosInstance.post(url, data);
       if (response.status >= 200 && response.status < 300) {
@@ -79,7 +80,7 @@ export const getEverySubInvoiceReq = createAsyncThunk(
 export const crudSubInvoiceReq = createAsyncThunk(
   "crudSubInvoiceReq",
   async function (data, { dispatch, rejectWithValue }) {
-    const url = `${REACT_APP_API_URL}/copt/crud_sub_invoice`;
+    const url = `${REACT_APP_API_URL}/capt/crud_sub_invoice`;
     try {
       const response = await axiosInstance.put(url, data);
       if (response.status >= 200 && response.status < 300) {
@@ -97,7 +98,7 @@ export const crudSubInvoiceReq = createAsyncThunk(
 export const getListCaptReq = createAsyncThunk(
   "getListCaptReq",
   async function (data, { dispatch, rejectWithValue }) {
-    const url = `${REACT_APP_API_URL}/copt/get_list_kopt`;
+    const url = `${REACT_APP_API_URL}/capt/get_list_kopt`;
     try {
       const response = await axiosInstance.post(url, data);
       if (response.status >= 200 && response.status < 300) {
@@ -111,11 +112,29 @@ export const getListCaptReq = createAsyncThunk(
   }
 );
 
-////// getListProdsReq - get список товаров с категориями
+////// getListProdsReq - get список товаров с категориями(все товары)
 export const getListProdsReq = createAsyncThunk(
   "getListProdsReq",
   async function (data, { dispatch, rejectWithValue }) {
-    const url = `${REACT_APP_API_URL}/capt/get_product_active`;
+    const url = `${REACT_APP_API_URL}/ta/get_product?workshop_guid=${data?.wh}&type=agent`;
+    try {
+      const response = await axiosInstance(url);
+      if (response.status >= 200 && response.status < 300) {
+        return response?.data;
+      } else {
+        throw Error(`Error: ${response.status}`);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+////// getActiveListProdsReq - get список активных товаров с категориями
+export const getActiveListProdsReq = createAsyncThunk(
+  "getActiveListProdsReq",
+  async function (data, { dispatch, rejectWithValue }) {
+    const url = `${REACT_APP_API_URL}/all/get_product_user`;
     try {
       const response = await axiosInstance.post(url, data);
       if (response.status >= 200 && response.status < 300) {
@@ -133,7 +152,7 @@ export const getListProdsReq = createAsyncThunk(
 export const addProdsInInvoiceReq = createAsyncThunk(
   "addProdsInInvoiceReq",
   async function (data, { dispatch, rejectWithValue }) {
-    const url = `${REACT_APP_API_URL}/copt/crud_subinvoice_product`;
+    const url = `${REACT_APP_API_URL}/capt/crud_subinvoice_product`;
     try {
       const response = await axiosInstance.put(url, data);
       if (response.status >= 200 && response.status < 300) {
@@ -271,6 +290,20 @@ const mainSlice = createSlice({
       state.preloader = false;
     });
     builder.addCase(getListProdsReq.pending, (state, action) => {
+      state.preloader = true;
+    });
+
+    ///////////////// getActiveListProdsReq
+    builder.addCase(getActiveListProdsReq.fulfilled, (state, action) => {
+      state.preloader = false;
+      state.listActiveProds = action.payload;
+    });
+    builder.addCase(getActiveListProdsReq.rejected, (state, action) => {
+      state.error = action.payload;
+      state.listActiveProds = [];
+      state.preloader = false;
+    });
+    builder.addCase(getActiveListProdsReq.pending, (state, action) => {
       state.preloader = true;
     });
 
