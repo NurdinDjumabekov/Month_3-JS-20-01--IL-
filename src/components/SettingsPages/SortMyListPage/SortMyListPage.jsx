@@ -1,9 +1,11 @@
 ////// hooks
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
+import { DragDropContext, Droppable } from "@hello-pangea/dnd";
 
 // ////// fns
 import {
+  activeCategFN,
   crudListWorkShopActiveReq,
   listAllProdsFN,
 } from "../../../store/reducers/mainSlice";
@@ -19,51 +21,28 @@ import TableRow from "@mui/material/TableRow";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { Checkbox } from "@mui/material";
+import SortMyEveryProd from "../SortMyEveryProd/SortMyEveryProd";
 
 ////// helpers
 import { myAlert } from "../../../helpers/MyAlert";
 
-const TableList = ({ item, listAllProds }) => {
-  const dispatch = useDispatch();
+const TableList = (props) => {
+  const { item, listAllProds, setCheckedPosition, checkedPosition } = props;
 
-  const [open, setOpen] = useState("1");
+  const dispatch = useDispatch();
   const [checked, setChecked] = useState(0);
   const [checkedStatus, setCheckedStatus] = useState(true);
+
+  const { activeCateg } = useSelector((state) => state.mainSlice);
 
   useEffect(() => {
     const list_check = item?.prods?.filter((prod) => prod?.status == 1);
     setChecked(list_check?.length >= 1 ? 1 : 0);
   }, [item?.prods]);
 
-  const obj52 = { maxWidth: 56, minWidth: 56, width: 56, padding: 1 };
-  const obj82 = { maxWidth: 82, padding: 1, minWidth: 82, width: 82 };
-
-  const onChange = async (obj) => {
-    console.log(obj, "obj");
-    const { status, guid } = obj;
-    const new_list = (list) => {
-      return list?.map((category) => {
-        return {
-          ...category,
-          prods: category?.prods?.map((product) => {
-            if (product?.guid == guid) {
-              return { ...product, status: status == 1 ? 0 : 1 };
-            }
-            return product;
-          }),
-        };
-      });
-    };
-    const send = { action_type: 2, guid, status: status == 1 ? 0 : 1 };
-    const res = await dispatch(crudListWorkShopActiveReq(send)).unwrap();
-    dispatch(listAllProdsFN(new_list(listAllProds)));
-    if (!!res) return;
-    else return dispatch(listAllProdsFN(listAllProds));
-  };
-
-  const clickCateg = (category_guid) => {
-    if (open == category_guid) setOpen("1");
-    else setOpen(category_guid);
+  const clickCateg = (categ) => {
+    if (categ == activeCateg) dispatch(activeCategFN("1"));
+    else dispatch(activeCategFN(categ));
   };
 
   const onChangeMain = async ({ prods, category_guid }) => {
@@ -73,19 +52,18 @@ const TableList = ({ item, listAllProds }) => {
       ?.map((product) => product?.guid)
       ?.join(", ");
 
-    const newListFN = (list) => {
-      return list?.map((category) => {
-        if (category?.category_guid == category_guid) {
-          return {
-            ...category,
-            prods: category?.prods?.map((product) => {
-              return { ...product, status: checkedStatus };
-            }),
-          };
-        }
-        return category;
-      });
-    };
+    const newListFN = (list) =>
+      list?.map((category) =>
+        category?.category_guid == category_guid
+          ? {
+              ...category,
+              prods: category?.prods?.map((product) => ({
+                ...product,
+                status: checkedStatus,
+              })),
+            }
+          : category
+      );
 
     dispatch(listAllProdsFN(newListFN(listAllProds)));
     const send = {
@@ -97,11 +75,44 @@ const TableList = ({ item, listAllProds }) => {
     setCheckedStatus(!checkedStatus);
 
     const res = await dispatch(crudListWorkShopActiveReq(send)).unwrap();
-    if (res == 1) return;
-    else {
+    if (res != 1) {
       myAlert("Упс, повторите пожалуйста еще раз", "error");
       dispatch(listAllProdsFN(listAllProds));
     }
+  };
+
+  const onDragEnd = (result) => {
+    if (!result.destination) return; // Если элемент перетащили за пределы списка, ничего не делаем
+
+    // Создаем копию массива товаров (глубокое копирование, чтобы избежать read-only ошибок)
+    const updatedProducts = item?.prods?.map((product) => ({ ...product }));
+
+    // Получаем элементы, которые меняем местами
+    const draggedItem = updatedProducts?.[result?.source?.index];
+    const targetItem = updatedProducts?.[result?.destination?.index];
+
+    if (!draggedItem || !targetItem) return; // Проверка, чтобы не было ошибок
+
+    // 🔥 Меняем `position` местами
+    const tempPosition = draggedItem.position;
+    draggedItem.position = targetItem.position;
+    targetItem.position = tempPosition;
+
+    // Удаляем перемещаемый элемент из старой позиции
+    const draggedProduct = updatedProducts.splice(result.source.index, 1)[0];
+
+    // Вставляем его в новую позицию
+    updatedProducts?.splice(result?.destination?.index, 0, draggedProduct);
+
+    // Обновляем список категорий в Redux
+    const updatedCategories = listAllProds?.map((category) =>
+      category?.category_guid === item?.category_guid
+        ? { ...category, prods: updatedProducts }
+        : category
+    );
+
+    dispatch(listAllProdsFN(updatedCategories));
+    setCheckedPosition(item?.category_guid); /// проверяю менялось ли что-то в списке
   };
 
   return (
@@ -115,7 +126,7 @@ const TableList = ({ item, listAllProds }) => {
         >
           <div style={{ display: "flex", justifyContent: "center" }}>
             <IconButton aria-label="expand row" size="small">
-              {open == item?.category_guid ? (
+              {activeCateg == item?.category_guid ? (
                 <KeyboardArrowUpIcon />
               ) : (
                 <KeyboardArrowDownIcon />
@@ -130,51 +141,46 @@ const TableList = ({ item, listAllProds }) => {
           {item?.category_name || "..."}
         </TableCell>
         <TableCell sx={{ width: 82, fontSize: 16, fontWeight: 600 }}>
-          <div className="mainCheckBox">
-            <Checkbox
-              checked={!!checked}
-              sx={{ "& .MuiSvgIcon-root": { fontSize: 32 } }}
-              color="success"
-              onChange={() => onChangeMain(item)}
-            />
-          </div>
+          <Checkbox
+            checked={!!checked}
+            sx={{ "& .MuiSvgIcon-root": { fontSize: 32 } }}
+            color="success"
+            onChange={() => onChangeMain(item)}
+          />
         </TableCell>
       </TableRow>
+
       <TableRow>
         <TableCell style={{ padding: 0, paddingTop: 0 }} colSpan={3}>
           <Collapse
-            in={open == item?.category_guid}
+            in={activeCateg == item?.category_guid}
             timeout={item?.prods?.length < 120 ? "auto" : 200}
             unmountOnExit
           >
-            <Table size="small" aria-label="purchases">
-              <TableBody>
-                {item?.prods?.map((i, ind) => (
-                  <TableRow key={i?.guid_product} onClick={() => onChange(i)}>
-                    <TableCell sx={obj52}>
-                      <p style={{ textAlign: "center", fontWeight: 500 }}>
-                        {ind + 1}
-                      </p>
-                    </TableCell>
-                    <TableCell
-                      sx={{ fontSize: 16, fontWeight: 500 }}
-                      style={{ padding: "10px 10px 10px 5px" }}
-                    >
-                      {i?.product_name || "..."}
-                    </TableCell>
-                    <TableCell
-                      sx={obj82}
-                      style={{ fontSize: 16, fontWeight: 500, paddingLeft: 3 }}
-                    >
-                      <Checkbox
-                        checked={!!i?.status}
-                        sx={{ "& .MuiSvgIcon-root": { fontSize: 32 } }}
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable droppableId="droppable-prods">
+                {(provided) => (
+                  <Table
+                    size="small"
+                    aria-label="purchases"
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                  >
+                    <TableBody>
+                      {item?.prods?.map((i, ind) => (
+                        <SortMyEveryProd
+                          i={i}
+                          ind={ind}
+                          listAllProds={listAllProds}
+                          key={ind}
+                        />
+                      ))}
+                      {provided?.placeholder}
+                    </TableBody>
+                  </Table>
+                )}
+              </Droppable>
+            </DragDropContext>
           </Collapse>
         </TableCell>
       </TableRow>

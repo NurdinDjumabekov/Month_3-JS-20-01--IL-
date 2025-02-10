@@ -22,7 +22,6 @@ const InvoicePages = () => {
       <Route path="/main" element={<ListInvoicePage />} />
       <Route path="/list_sub_invoice" element={<ListSubInvoicePage />} />
       <Route path="/every_sub_invoice" element={<EverySubInvoicePage />} />
-
       <Route path="/crud_invoice" element={<ListProdSubInvoicePage />} />
       <Route path="/input_prods" element={<InputInvoicePage />} />
       <Route path="/create_sub_invoice" element={<CreateSubInvoice />} />

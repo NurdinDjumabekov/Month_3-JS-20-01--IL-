@@ -6,7 +6,11 @@ import { useEffect, useState } from "react";
 import {
   getListProdsReq,
   getListWorkShopActiveReq,
+  saveListWorkShopActiveReq,
 } from "../../../store/reducers/mainSlice";
+
+/////// icons
+import SaveAsIcon from "@mui/icons-material/SaveAs";
 
 ////// components
 import TableList from "../../../components/SettingsPages/SortMyListPage/SortMyListPage";
@@ -19,11 +23,15 @@ import Select from "react-select";
 
 ////// style
 import "./style.scss";
+import ConfirmModal from "../../../common/ConfirmModal/ConfirmModal";
+import { myAlert } from "../../../helpers/MyAlert";
 
 const SortMyListPage = () => {
   const dispatch = useDispatch();
 
   const [select, setSelect] = useState({});
+  const [checkedPosition, setCheckedPosition] = useState("");
+  const [saveModal, setSaveModal] = useState(false);
   const { listAllProds, listWH } = useSelector((state) => state.mainSlice);
 
   useEffect(() => {
@@ -43,6 +51,32 @@ const SortMyListPage = () => {
   const onChangeWH = async ({ label, value }) => {
     setSelect({ value, label });
     dispatch(getListProdsReq({ wh: value }));
+  };
+
+  console.log(listAllProds, "listAllProds");
+
+  const savePositionProds = async () => {
+    if (listAllProds?.length == 0) return myAlert("Изменений нет", "error");
+
+    const new_obj = listAllProds?.find(
+      ({ category_guid }) => category_guid == checkedPosition
+    );
+
+    const new_list = new_obj?.prods?.map((i) => {
+      return { guid: i.guid, position: i?.position };
+    });
+
+    const res = await dispatch(
+      saveListWorkShopActiveReq({ new_list })
+    ).unwrap();
+
+    if (!!res) {
+      setCheckedPosition("");
+      setSaveModal(false);
+      getData();
+    } else {
+      myAlert("Что-то пошло не так, повторите попытку", "error");
+    }
   };
 
   return (
@@ -67,12 +101,28 @@ const SortMyListPage = () => {
                   item={item}
                   index={index}
                   listAllProds={listAllProds}
+                  checkedPosition={checkedPosition}
+                  setCheckedPosition={setCheckedPosition}
                 />
               ))}
             </TableBody>
           </Table>
         </TableContainer>
       </div>
+
+      {/* //// для сохранения изменения перемещенных товаров */}
+      {!!checkedPosition && (
+        <button className="checkedPosition" onClick={() => setSaveModal(true)}>
+          <SaveAsIcon sx={{ color: "#fff" }} />
+        </button>
+      )}
+
+      <ConfirmModal
+        state={!!saveModal}
+        yesFN={savePositionProds}
+        noFN={() => setSaveModal(false)}
+        title={"Сохранить измененния ?"}
+      />
     </div>
   );
 };

@@ -35,4 +35,17 @@
       }
     }
   }
+
+  .checkedPosition {
+    position: fixed;
+    left: 60px;
+    bottom: 160px;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #2f5ae9;
+    border-radius: 50%;
+  }
 }

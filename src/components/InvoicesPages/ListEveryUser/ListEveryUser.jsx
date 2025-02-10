@@ -1,15 +1,17 @@
 ////// hooks
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // ////// fns
 import {
+  activeCategFN,
+  getActiveListProdsReq,
   getListProdsReq,
   getListWorkShopActiveReq,
 } from "../../../store/reducers/mainSlice";
 
 ////// components
-import NavMenu from "../../../common/NavMenu/NavMenu";
 import PropTypes from "prop-types";
 import Collapse from "@mui/material/Collapse";
 import IconButton from "@mui/material/IconButton";
@@ -26,13 +28,13 @@ import Select from "react-select";
 ////// style
 import "./style.scss";
 
-const ListEveryUser = ({ list, type }) => {
+const ListEveryUser = ({ list, type, guid_sub_invoice }) => {
   /// 1 - все товары, 2 - выбранные
   const dispatch = useDispatch();
 
   const [select, setSelect] = useState({});
 
-  const { listWH } = useSelector((state) => state.mainSlice);
+  const { listWH, activeCateg } = useSelector((state) => state.mainSlice);
 
   useEffect(() => {
     getData();
@@ -44,18 +46,19 @@ const ListEveryUser = ({ list, type }) => {
     const label = res?.[0]?.name;
     if (!!value) {
       setSelect({ value, label });
-      dispatch(getListProdsReq({ wh: value }));
+      if (type == 1) dispatch(getListProdsReq({ wh: value }));
+      else if (type == 2) dispatch(getActiveListProdsReq({ wh: value }));
     }
   };
 
   const onChangeWH = async ({ label, value }) => {
     setSelect({ value, label });
-    dispatch(getListProdsReq({ wh: value }));
+    if (type == 1) dispatch(getListProdsReq({ wh: value }));
+    else if (type == 2) dispatch(getActiveListProdsReq({ wh: value }));
   };
 
   return (
     <div className="sortMyListPage">
-      <NavMenu navText={`Настройки списка`} />
       <div className="myInputs">
         <Select
           options={listWH}
@@ -69,8 +72,13 @@ const ListEveryUser = ({ list, type }) => {
         <TableContainer component={Paper}>
           <Table aria-label="collapsible table">
             <TableBody>
-              {list?.map((row, index) => (
-                <TableList key={row?.category_guid} row={row} index={index} />
+              {list?.map((row) => (
+                <TableList
+                  key={row?.category_guid}
+                  row={row}
+                  guid_sub_invoice={guid_sub_invoice}
+                  activeCateg={activeCateg}
+                />
               ))}
             </TableBody>
           </Table>
@@ -82,24 +90,42 @@ const ListEveryUser = ({ list, type }) => {
 
 export default ListEveryUser;
 
-function TableList({ row, index }) {
-  const [open, setOpen] = useState(false);
+const TableList = ({ row, guid_sub_invoice, activeCateg }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const clickProd = (item) => {
+    const state = {
+      ...item,
+      product_guid: item?.guid_product,
+      invoice_guid: guid_sub_invoice,
+      action: 1,
+    }; /// добавление товара
+    navigate("/invoice/input_prods", { state });
+  };
+
+  ///// меняю активную категорию
+  const editActiveCateg = (categ) => {
+    if (categ == activeCateg) dispatch(activeCategFN("1"));
+    else dispatch(activeCategFN(categ));
+  };
+  const checkCateg = row?.category_guid == activeCateg;
 
   return (
     <>
       <TableRow
         sx={{ "& > *": { borderBottom: "unset" }, background: "#edf2f985" }}
-        onClick={() => setOpen(!open)}
+        onClick={() => editActiveCateg(row?.category_guid)}
       >
         <TableCell sx={{ width: 56, padding: 1 }}>
           <div style={{ display: "flex", justifyContent: "center" }}>
             <IconButton aria-label="expand row" size="small">
-              {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+              {checkCateg ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
             </IconButton>
           </div>
         </TableCell>
         <TableCell sx={{ fontSize: 16, fontWeight: 600, paddingLeft: "5px" }}>
-          {row?.name || "..."}
+          {row?.category_name || "..."}
         </TableCell>
         <TableCell sx={{ width: 82, fontSize: 16, fontWeight: 600 }}>
           {row?.prods?.length}
@@ -107,11 +133,14 @@ function TableList({ row, index }) {
       </TableRow>
       <TableRow>
         <TableCell style={{ padding: 0, paddingTop: 0 }} colSpan={3}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
+          <Collapse in={checkCateg} timeout="auto" unmountOnExit>
             <Table size="small" aria-label="purchases">
               <TableBody>
                 {row?.prods?.map((historyRow, ind) => (
-                  <TableRow key={historyRow?.guid_product}>
+                  <TableRow
+                    key={historyRow?.guid}
+                    onClick={() => clickProd(historyRow)}
+                  >
                     <TableCell sx={{ maxWidth: 56, minWidth: 56, padding: 1 }}>
                       <p style={{ textAlign: "center", fontWeight: 500 }}>
                         {ind + 1}
@@ -132,7 +161,7 @@ function TableList({ row, index }) {
       </TableRow>
     </>
   );
-}
+};
 
 TableList.propTypes = {
   row: PropTypes.shape({

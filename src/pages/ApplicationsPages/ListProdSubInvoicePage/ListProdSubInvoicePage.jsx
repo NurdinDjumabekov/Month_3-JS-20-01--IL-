@@ -7,14 +7,12 @@ import { useEffect, useRef, useState } from "react";
 import {
   activeSlideForProdFN,
   getEverySubInvoiceReq,
-  getListProdsReq,
 } from "../../../store/reducers/mainSlice";
 
 ////// components
 import NavMenu from "../../../common/NavMenu/NavMenu";
 import { NoneBtn } from "../CreateInvoicePage/CreateInvoicePage";
 import Slider from "react-slick";
-import AllListProd from "../../../components/ApplicationsPages/ListProdSubInvoicePage/AllListProd/AllListProd";
 import VeiwProducts from "../../../components/ApplicationsPages/EverySubInvoicePage/VeiwProducts/VeiwProducts";
 import ListEveryUser from "../../../components/InvoicesPages/ListEveryUser/ListEveryUser";
 
@@ -25,6 +23,8 @@ import "./style.scss";
 import { listMenuProdsLocal } from "../../../helpers/LocalData";
 
 //// icons
+import arrow from "../../../assets/icons/arrowNav.svg";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 const ListProdSubInvoicePage = () => {
   const dispatch = useDispatch();
@@ -35,11 +35,9 @@ const ListProdSubInvoicePage = () => {
   const menuRefs = useRef([]);
   const sliderRef = useRef(null);
 
-  const { listMenu, activeSlideForProd } = useSelector(
-    (state) => state.mainSlice
-  );
-  const { everySubInvoice } = useSelector((state) => state.mainSlice);
-  const { listAllProds } = useSelector((state) => state.mainSlice);
+  const { listActiveProds } = useSelector((state) => state.mainSlice);
+  const { listMenu, activeSlideForProd, everySubInvoice, listAllProds } =
+    useSelector((state) => state.mainSlice);
 
   useEffect(() => {
     dispatch(getEverySubInvoiceReq({ guid_sub_invoice: state }));
@@ -76,7 +74,18 @@ const ListProdSubInvoicePage = () => {
 
   return (
     <div className="listInvoicePage subInvoices innerSlider">
-      <NavMenu navText={`Выбор продукции`} />
+      <NavMenu>
+        <div className="nav" onClick={() => navigate(-1)}>
+          <button className="navArrow">
+            <img src={arrow} alt="<" />
+          </button>
+          <p className="navText">Выбор продукции</p>
+        </div>
+        <SettingsIcon
+          onClick={() => navigate("/setting/list")}
+          sx={{ width: 25, height: 25, color: "gray" }}
+        />
+      </NavMenu>
       <div className="actionForPoints">
         <div className="listActions" ref={listActionsRef}>
           {listMenuProdsLocal?.map(({ codeid, name }, idx) => (
@@ -93,12 +102,19 @@ const ListProdSubInvoicePage = () => {
         <div className="actionForPoints__content">
           <Slider ref={sliderRef} {...settings}>
             <div className="everySlide">
-              {/* <AllListProd guid_sub_invoice={state} /> */}
-              <ListEveryUser list={listAllProds} type={1} />
+              <ListEveryUser
+                list={listAllProds}
+                type={1}
+                guid_sub_invoice={state}
+              />
             </div>
 
             <div className="everySlide">
-              {/* <ListEveryUser list={listAllProds} type={2} /> */}
+              <ListEveryUser
+                list={listActiveProds}
+                type={2}
+                guid_sub_invoice={state}
+              />
             </div>
 
             <div className="everySlide">

@@ -19,6 +19,7 @@ const initialState = {
 
   activeSlide: 0,
   activeSlideForProd: 0,
+  activeCateg: "1", /// для активных открытых селектор категорий
   listMenu: [...listMenuLocal],
 };
 
@@ -116,9 +117,9 @@ export const getListCaptReq = createAsyncThunk(
 export const getListProdsReq = createAsyncThunk(
   "getListProdsReq",
   async function (data, { dispatch, rejectWithValue }) {
-    const url = `${REACT_APP_API_URL}/ta/get_product?workshop_guid=${data?.wh}&type=agent`;
+    const url = `${REACT_APP_API_URL}/all/get_product_user`;
     try {
-      const response = await axiosInstance(url);
+      const response = await axiosInstance.post(url, data);
       if (response.status >= 200 && response.status < 300) {
         return response?.data;
       } else {
@@ -134,7 +135,7 @@ export const getListProdsReq = createAsyncThunk(
 export const getActiveListProdsReq = createAsyncThunk(
   "getActiveListProdsReq",
   async function (data, { dispatch, rejectWithValue }) {
-    const url = `${REACT_APP_API_URL}/all/get_product_user`;
+    const url = `${REACT_APP_API_URL}/capt/get_product_active`;
     try {
       const response = await axiosInstance.post(url, data);
       if (response.status >= 200 && response.status < 300) {
@@ -184,7 +185,7 @@ export const getListWorkShopActiveReq = createAsyncThunk(
   }
 );
 
-////// crudListWorkShopActiveReq - get список цехов
+////// crudListWorkShopActiveReq - crud список товаров каждого usera
 export const crudListWorkShopActiveReq = createAsyncThunk(
   "crudListWorkShopActiveReq",
   async function (data, { dispatch, rejectWithValue }) {
@@ -193,6 +194,24 @@ export const crudListWorkShopActiveReq = createAsyncThunk(
       const response = await axiosInstance.post(url, data);
       if (response.status >= 200 && response.status < 300) {
         return response?.data?.[0]?.result;
+      } else {
+        throw Error(`Error: ${response.status}`);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+////// saveListWorkShopActiveReq - save список изменений товаров каждого usera
+export const saveListWorkShopActiveReq = createAsyncThunk(
+  "saveListWorkShopActiveReq",
+  async function (data, { dispatch, rejectWithValue }) {
+    const url = `${REACT_APP_API_URL}/capt/save_position_prods`;
+    try {
+      const response = await axiosInstance.post(url, data);
+      if (response.status >= 200 && response.status < 300) {
+        return response?.data?.res;
       } else {
         throw Error(`Error: ${response.status}`);
       }
@@ -220,6 +239,10 @@ const mainSlice = createSlice({
 
     listAllProdsFN: (state, action) => {
       state.listAllProds = action?.payload;
+    },
+
+    activeCategFN: (state, action) => {
+      state.activeCateg = action?.payload;
     },
   },
   extraReducers: (builder) => {
@@ -342,6 +365,7 @@ export const {
   activeSlideForProdFN,
   everySubInvoiceFN,
   listAllProdsFN,
+  activeCategFN,
 } = mainSlice.actions;
 
 export default mainSlice.reducer;
