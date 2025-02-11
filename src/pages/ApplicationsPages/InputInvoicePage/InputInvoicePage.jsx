@@ -11,6 +11,7 @@ import NavMenu from "../../../common/NavMenu/NavMenu";
 
 ///// icons
 import krest from "../../../assets/icons/krest.svg";
+import DeleteIcon from "../../../assets/MyIcons/DeleteIcon";
 
 ///// helpers
 import { myAlert } from "../../../helpers/MyAlert";
@@ -28,7 +29,6 @@ const InputInvoicePage = () => {
   const inputRef = useRef(null);
 
   /// action - 1 - создание заявки, 2 - редактирвоание заявки
-
   const { product_name, invoice_guid, workshop_price } = location?.state;
   const { category_name, product_guid, action } = location?.state;
   const { count_kg, type_unit } = location?.state;
@@ -71,6 +71,24 @@ const InputInvoicePage = () => {
     }
   };
 
+  const delProdsFN = async () => {
+    const data = {
+      invoice_guid,
+      product_guid,
+      workshop_price,
+      count,
+      user_guid: dataSave?.guid,
+      user_type: dataSave?.user_type,
+      action_type: 3,
+    };
+    const res = await dispatch(addProdsInInvoiceReq(data)).unwrap();
+    if (!!res) {
+      myAlert("Продукт удалён");
+      navigate(-1);
+      dispatch(getEverySubInvoiceReq({ guid_sub_invoice: invoice_guid }));
+    }
+  };
+
   const objUnit = {
     1: "Введите итоговое кол-во товара",
     2: "Введите итоговый вес товара",
@@ -101,6 +119,11 @@ const InputInvoicePage = () => {
           <button type="submit">
             <p>Добавить</p>
           </button>
+          {action == 2 && (
+            <div className="delete" onClick={delProdsFN}>
+              <DeleteIcon color={"#fff"} />
+            </div>
+          )}
         </form>
       </div>
     </>

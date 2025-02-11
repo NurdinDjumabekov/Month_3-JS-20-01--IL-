@@ -15,6 +15,7 @@ import SaveAsIcon from "@mui/icons-material/SaveAs";
 ////// components
 import TableList from "../../../components/SettingsPages/SortMyListPage/SortMyListPage";
 import NavMenu from "../../../common/NavMenu/NavMenu";
+import ConfirmModal from "../../../common/ConfirmModal/ConfirmModal";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableContainer from "@mui/material/TableContainer";
@@ -23,14 +24,15 @@ import Select from "react-select";
 
 ////// style
 import "./style.scss";
-import ConfirmModal from "../../../common/ConfirmModal/ConfirmModal";
+
+////// helpers
 import { myAlert } from "../../../helpers/MyAlert";
 
 const SortMyListPage = () => {
   const dispatch = useDispatch();
 
   const [select, setSelect] = useState({});
-  const [checkedPosition, setCheckedPosition] = useState("");
+  const [checkedPosition, setCheckedPosition] = useState("1");
   const [saveModal, setSaveModal] = useState(false);
   const { listAllProds, listWH } = useSelector((state) => state.mainSlice);
 
@@ -53,17 +55,15 @@ const SortMyListPage = () => {
     dispatch(getListProdsReq({ wh: value }));
   };
 
-  console.log(listAllProds, "listAllProds");
-
   const savePositionProds = async () => {
     if (listAllProds?.length == 0) return myAlert("Изменений нет", "error");
 
     const new_obj = listAllProds?.find(
-      ({ category_guid }) => category_guid == checkedPosition
+      (i) => i?.category_guid == checkedPosition
     );
 
-    const new_list = new_obj?.prods?.map((i) => {
-      return { guid: i.guid, position: i?.position };
+    const new_list = new_obj?.prods?.map((i, index) => {
+      return { guid: i?.guid, position: index + 1 };
     });
 
     const res = await dispatch(
@@ -71,7 +71,7 @@ const SortMyListPage = () => {
     ).unwrap();
 
     if (!!res) {
-      setCheckedPosition("");
+      setCheckedPosition("1");
       setSaveModal(false);
       getData();
     } else {
@@ -101,8 +101,8 @@ const SortMyListPage = () => {
                   item={item}
                   index={index}
                   listAllProds={listAllProds}
-                  checkedPosition={checkedPosition}
                   setCheckedPosition={setCheckedPosition}
+                  checkedPosition={checkedPosition}
                 />
               ))}
             </TableBody>
@@ -110,8 +110,8 @@ const SortMyListPage = () => {
         </TableContainer>
       </div>
 
-      {/* //// для сохранения изменения перемещенных товаров */}
-      {!!checkedPosition && (
+      {/* //// для сохранения изменения перемещенных товаров (1 - пустое значение) */}
+      {checkedPosition != "1" && (
         <button className="checkedPosition" onClick={() => setSaveModal(true)}>
           <SaveAsIcon sx={{ color: "#fff" }} />
         </button>
@@ -121,7 +121,7 @@ const SortMyListPage = () => {
         state={!!saveModal}
         yesFN={savePositionProds}
         noFN={() => setSaveModal(false)}
-        title={"Сохранить измененния ?"}
+        title={"Сохранить изменения ?"}
       />
     </div>
   );

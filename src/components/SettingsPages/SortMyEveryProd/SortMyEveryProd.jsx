@@ -54,10 +54,12 @@ const SortMyEveryProd = ({ i, ind, listAllProds }) => {
             {i?.product_name || "..."}
           </TableCell>
           <TableCell sx={obj82}>
-            <Checkbox
-              checked={!!i?.status}
-              sx={{ "& .MuiSvgIcon-root": { fontSize: 32 } }}
-            />
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <Checkbox
+                checked={!!i?.status}
+                sx={{ "& .MuiSvgIcon-root": { fontSize: 32 } }}
+              />
+            </div>
           </TableCell>
         </TableRow>
       )}

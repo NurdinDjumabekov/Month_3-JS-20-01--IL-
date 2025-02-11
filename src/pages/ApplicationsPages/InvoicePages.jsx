@@ -1,6 +1,6 @@
 //////// hooks
 import React, { useState, useEffect } from "react";
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 /////// components
@@ -16,6 +16,9 @@ import ListProdSubInvoicePage from "./ListProdSubInvoicePage/ListProdSubInvoiceP
 const InvoicePages = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  console.log(location, "location");
 
   return (
     <Routes>

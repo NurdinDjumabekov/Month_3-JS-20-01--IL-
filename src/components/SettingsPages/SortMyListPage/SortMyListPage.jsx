@@ -41,6 +41,7 @@ const TableList = (props) => {
   }, [item?.prods]);
 
   const clickCateg = (categ) => {
+    if (checkedPosition != "1") return myAlert("Сохраните данные!", "error");
     if (categ == activeCateg) dispatch(activeCategFN("1"));
     else dispatch(activeCategFN(categ));
   };
@@ -106,7 +107,7 @@ const TableList = (props) => {
 
     // Обновляем список категорий в Redux
     const updatedCategories = listAllProds?.map((category) =>
-      category?.category_guid === item?.category_guid
+      category?.category_guid == item?.category_guid
         ? { ...category, prods: updatedProducts }
         : category
     );

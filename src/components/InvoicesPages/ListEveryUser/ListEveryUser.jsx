@@ -1,7 +1,7 @@
 ////// hooks
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 // ////// fns
 import {
@@ -69,7 +69,7 @@ const ListEveryUser = ({ list, type, guid_sub_invoice }) => {
         />
       </div>
       <div className="sortMyListPage__inner">
-        <TableContainer component={Paper}>
+        <TableContainer key={list?.length} component={Paper}>
           <Table aria-label="collapsible table">
             <TableBody>
               {list?.map((row) => (
@@ -133,7 +133,12 @@ const TableList = ({ row, guid_sub_invoice, activeCateg }) => {
       </TableRow>
       <TableRow>
         <TableCell style={{ padding: 0, paddingTop: 0 }} colSpan={3}>
-          <Collapse in={checkCateg} timeout="auto" unmountOnExit>
+          <Collapse
+            in={checkCateg}
+            timeout="auto"
+            unmountOnExit
+            sx={{ maxHeight: "400px", overflowY: "auto" }}
+          >
             <Table size="small" aria-label="purchases">
               <TableBody>
                 {row?.prods?.map((historyRow, ind) => (
